@@ -1,5 +1,7 @@
 package org.zerock.guestbook.service;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -10,6 +12,7 @@ import org.zerock.guestbook.dto.GuestbookDTO;
 import org.zerock.guestbook.dto.PageRequestDTO;
 import org.zerock.guestbook.dto.PageResultDTO;
 import org.zerock.guestbook.entity.Guestbook;
+import org.zerock.guestbook.entity.QGuestbook;
 import org.zerock.guestbook.repository.GuestbookRepository;
 
 import java.util.Optional;
@@ -34,7 +37,9 @@ public class GuestbookServiceImpl implements GuestbookService{
     public PageResultDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO dto) {
         Pageable pageable = dto.getPageable(Sort.by("gno").descending());
 
-        Page<Guestbook> result = guestbookRepository.findAll(pageable);
+        BooleanBuilder booleanBuilder = getSearch(dto);
+
+        Page<Guestbook> result = guestbookRepository.findAll(booleanBuilder,pageable);
 
         Function<Guestbook,GuestbookDTO> fn = entity -> entityToDto(entity);
 
@@ -45,5 +50,59 @@ public class GuestbookServiceImpl implements GuestbookService{
     public GuestbookDTO read(Long gno) {
         Optional<Guestbook> result = guestbookRepository.findById(gno);
         return result.isPresent() ? entityToDto(result.get()) : null;
+    }
+
+    @Override
+    public void modify(GuestbookDTO dto) {
+        Optional<Guestbook> result = guestbookRepository.findById(dto.getGno());
+        if (result.isPresent()){
+            Guestbook guestbook = result.get();
+
+            guestbook.changeContent(dto.getContent());
+            guestbook.changeTitle(dto.getTitle());
+
+            guestbookRepository.save(guestbook);
+        }
+    }
+
+    @Override
+    public void remove(Long gno) {
+        guestbookRepository.deleteById(gno);
+    }
+
+    private BooleanBuilder getSearch(PageRequestDTO requestDTO){
+        String type = requestDTO.getType();
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        QGuestbook qGuestbook = QGuestbook.guestbook;
+
+        String keyword = requestDTO.getKeyword();
+
+        BooleanExpression expression = qGuestbook.gno.gt(0L);
+
+        booleanBuilder.and(expression);
+
+        if(type==null || type.trim().length()==0){
+            return booleanBuilder;
+        }
+
+        BooleanBuilder conditionBuilder = new BooleanBuilder();
+
+        if(type.contains("t")){
+            conditionBuilder.or(qGuestbook.title.contains(keyword));
+        }
+
+        if(type.contains("c")){
+            conditionBuilder.or(qGuestbook.content.contains(keyword));
+        }
+
+        if(type.contains("w")){
+            conditionBuilder.or(qGuestbook.writer.contains(keyword));
+        }
+
+        booleanBuilder.and(conditionBuilder);
+
+        return booleanBuilder;
     }
 }
