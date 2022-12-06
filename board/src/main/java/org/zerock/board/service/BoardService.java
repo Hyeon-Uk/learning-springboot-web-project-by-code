@@ -15,6 +15,8 @@ public interface BoardService {
 
     void removeWithReplies(Long bno);
 
+    void modify(BoardDTO boardDTO);
+
     default Board dtoToEntity(BoardDTO dto){
         return Board.builder()
                 .title(dto.getTitle())

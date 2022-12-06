@@ -3,10 +3,12 @@ package org.zerock.board.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.board.dto.BoardDTO;
 import org.zerock.board.dto.PageRequestDTO;
 import org.zerock.board.dto.PageResultDTO;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -49,5 +51,23 @@ class BoardServiceTest {
     public void testRemove(){
         Long bno = 1l;
         boardService.removeWithReplies(bno);
+    }
+
+    @Test
+    @Transactional
+    public void testModify(){
+        BoardDTO dto = BoardDTO.builder()
+                .bno(2l)
+                .title("변경된 제목")
+                .content("변경된 타이틀")
+                .build();
+
+        boardService.modify(dto);
+
+        BoardDTO result = boardService.get(2l);
+
+        assertThat(result.getTitle()).isEqualTo(dto.getTitle());
+        assertThat(result.getBno()).isEqualTo(dto.getBno());
+        assertThat(result.getContent()).isEqualTo(dto.getContent());
     }
 }
