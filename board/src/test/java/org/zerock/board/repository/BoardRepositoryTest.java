@@ -87,4 +87,17 @@ class BoardRepositoryTest {
         Object[] arr = (Object[]) result;
         System.out.println(Arrays.toString(arr));
     }
+
+    @Test
+    public void testSearch1(){
+        repository.search1();
+    }
+
+    @Test
+    public void testSearchPage(){
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+
+        Page<Object[]> result = repository.searchPage("t", "1", pageable);
+        System.out.println(result);
+    }
 }
