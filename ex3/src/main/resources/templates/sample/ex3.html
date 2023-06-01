@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul>
+    <h1 th:text="${result}"></h1>
+    <h1 th:text="${dto}"></h1>
+
+    <script th:inline="javascript">
+        var msg=[[${result}]];
+        var dto = [[${dto}]];
+    </script>
+</ul>
+</body>
+</html>
