@@ -35,7 +35,7 @@ public class UploadController {
     private String uploadPath;
 
     @GetMapping("/display")
-    public ResponseEntity<byte[]> getFile(String fileName){
+    public ResponseEntity<byte[]> getFile(String fileName,String size){
         ResponseEntity<byte[]> result = null;
         try{
             String srcFileName = URLDecoder.decode(fileName,"UTF-8");
@@ -46,6 +46,10 @@ public class UploadController {
             sf.append(uploadPath).append(File.separator).append(srcFileName);
 
             File file = new File(sf.toString());
+
+            if(size!=null && size.equals("1")){
+                file = new File(file.getParent(),file.getName().substring(2));
+            }
 
             log.info("display) file : {}",file);
 
