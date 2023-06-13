@@ -34,7 +34,10 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.1.RELEASE'
 // https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-java8time
     implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+//    implementation 'mysql:mysql-connector-java:8.0.33'
 
+    compileOnly 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 }
 
 tasks.named('test') {
